@@ -33,3 +33,7 @@ variable "worker_instance_count" {
 variable "docker_api_ip" {
   default = "0.0.0.0"
 }
+
+variable "docker_api_ip_allow" {
+  default = "86.120.86.211"
+}
