@@ -23,7 +23,7 @@ variable "machine_type" {
 }
 
 variable "ssh_user" {
-  default = "stefan"
+  default = "ubuntu"
 }
 
 variable "worker_instance_count" {
