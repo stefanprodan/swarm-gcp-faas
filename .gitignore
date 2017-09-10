@@ -22,3 +22,6 @@
 
 # Module directory
 .terraform/
+
+# GCP key
+account.json
