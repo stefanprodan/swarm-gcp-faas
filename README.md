@@ -27,7 +27,8 @@ terraform apply \
 -var project=my-swarm-proj \
 -var region=europe-west3 \
 -var region_zone=europe-west3-a \
--var machine_type=n1-standard-1 \
+-var manager_machine_type=n1-standard-1 \
+-var worker_machine_type=n1-standard-2 \
 -var worker_instance_count=2 \
 -var docker_version=17.06.0~ce-0~ubuntu \
 -var docker_api_ip_allow=86.124.244.168

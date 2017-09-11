@@ -1,7 +1,7 @@
 resource "google_compute_instance" "worker" {
   count        = "${var.worker_instance_count}"
   name         = "${terraform.workspace}-worker-${count.index + 1}"
-  machine_type = "${var.machine_type}"
+  machine_type = "${var.worker_machine_type}"
   zone         = "${var.region_zone}"
 
   tags = ["swarm", "worker"]

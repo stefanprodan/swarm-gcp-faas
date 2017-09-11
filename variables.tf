@@ -18,7 +18,7 @@ variable "machine_image" {
   default = "ubuntu-os-cloud/ubuntu-1604-lts"
 }
 
-variable "machine_type" {
+variable "manager_machine_type" {
   default = "n1-standard-1"
 }
 
@@ -28,6 +28,10 @@ variable "ssh_user" {
 
 variable "manager_instance_count" {
   default = 2
+}
+
+variable "worker_machine_type" {
+  default = "n1-standard-1"
 }
 
 variable "worker_instance_count" {
