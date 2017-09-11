@@ -26,6 +26,10 @@ variable "ssh_user" {
   default = "ubuntu"
 }
 
+variable "manager_instance_count" {
+  default = 2
+}
+
 variable "worker_instance_count" {
   default = 2
 }
