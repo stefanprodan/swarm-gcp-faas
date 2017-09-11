@@ -10,9 +10,9 @@ $ cd swarm-gcp
 $ terraform init
 ```
 
-Before running the project you'll have to create a service account key. 
+Before running the project you'll have to create a GCP service account key. 
 Go to _Google Cloud Platform -> API Manager -> Credentials -> Create Credentials -> Service account key_ and 
-chose JSON as key type. Rename the file to `account.json` and put it the project root next to `main.tf`.
+chose JSON as key type. Rename the file to `account.json` and put it in the project root next to `main.tf`.
 Add your SSH key under _Compute Engine -> Metadata -> SSH Keys_.
 
 ### Usage
@@ -36,7 +36,7 @@ terraform apply \
 
 This will do the following:
 
-* provisions 5 VMs with Ubuntu 16.04 LTS
+* provisions 5 VMs with Ubuntu 16.04 LTS and a 50GB boot disk
 * starts the manager nodes and installs Docker CE via SSH
 * customizes the Docker daemon systemd config by enabling the experimental features and the metrics endpoint
 * initializes the first manager node as the Docker Swarm leader and extracts the join tokens
