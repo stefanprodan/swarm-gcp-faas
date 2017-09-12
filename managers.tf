@@ -9,15 +9,14 @@ resource "google_compute_instance" "manager" {
   boot_disk {
     initialize_params {
       image = "${var.machine_image}"
-      size = "50"
+      size  = "50"
     }
   }
 
   network_interface {
-    network = "default"
+    network = "${google_compute_network.swarm.name}"
 
-    access_config {
-    }
+    access_config {}
   }
 
   metadata {
@@ -52,6 +51,8 @@ resource "google_compute_instance" "manager" {
       "sudo docker swarm init --advertise-addr ${self.network_interface.0.address}",
     ]
   }
+
+  depends_on = ["google_compute_firewall.ssh", "google_compute_firewall.internal"]
 }
 
 resource "google_compute_instance" "manager_follower" {
@@ -65,15 +66,14 @@ resource "google_compute_instance" "manager_follower" {
   boot_disk {
     initialize_params {
       image = "${var.machine_image}"
-      size = "50"
+      size  = "50"
     }
   }
 
   network_interface {
-    network = "default"
+    network = "${google_compute_network.swarm.name}"
 
-    access_config {
-    }
+    access_config {}
   }
 
   metadata {

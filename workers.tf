@@ -9,15 +9,14 @@ resource "google_compute_instance" "worker" {
   boot_disk {
     initialize_params {
       image = "${var.machine_image}"
-      size = "50"
+      size  = "50"
     }
   }
 
   network_interface {
-    network = "default"
+    network = "${google_compute_network.swarm.name}"
 
-    access_config {
-    }
+    access_config {}
   }
 
   metadata {

@@ -4,6 +4,11 @@ provider "google" {
   region      = "${var.region}"
 }
 
+resource "google_compute_network" "swarm" {
+  name                    = "${terraform.workspace}-network"
+  auto_create_subnetworks = true
+}
+
 data "template_file" "docker_conf" {
   template = "${file("conf/docker.tpl")}"
 
