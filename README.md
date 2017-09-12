@@ -37,6 +37,7 @@ terraform apply \
 
 This will do the following:
 
+* creates a dedicated network and a firewall rule to allow internal traffic between swarm nodes
 * provisions 5 VMs with Ubuntu 16.04 LTS and a 50GB boot disk
 * starts the manager nodes and installs Docker CE via SSH
 * customizes the Docker daemon systemd config by enabling the experimental features and the metrics endpoint
@@ -109,7 +110,7 @@ terraform apply \
 -var manager_instance_count=3 \
 -var worker_instance_count=3
 
-# remove two worker
+# remove two workers
 terraform apply \
 -var project=my-swarm-proj \
 -var region=europe-west3 \
