@@ -27,7 +27,7 @@ variable "ssh_user" {
 }
 
 variable "manager_instance_count" {
-  default = 2
+  default = 3
 }
 
 variable "worker_machine_type" {

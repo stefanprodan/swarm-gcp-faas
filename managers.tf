@@ -56,7 +56,7 @@ resource "google_compute_instance" "manager" {
 }
 
 resource "google_compute_instance" "manager_follower" {
-  count        = "${var.manager_instance_count}"
+  count        = "${var.manager_instance_count - 1}"
   name         = "${terraform.workspace}-manager-${count.index + 2}"
   machine_type = "${var.manager_machine_type}"
   zone         = "${var.region_zone}"
@@ -107,5 +107,16 @@ resource "google_compute_instance" "manager_follower" {
       "sudo /tmp/install-docker-ce.sh ${var.docker_version}",
       "sudo docker swarm join --token ${data.external.swarm_tokens.result.manager} ${google_compute_instance.manager.0.network_interface.0.address}:2377",
     ]
+  }
+
+  # leave swarm on destroy
+  provisioner "remote-exec" {
+    when = "destroy"
+
+    inline = [
+      "sudo docker swarm leave --force",
+    ]
+
+    on_failure = "continue"
   }
 }

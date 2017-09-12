@@ -17,7 +17,7 @@ Add your SSH key under _Compute Engine -> Metadata -> SSH Keys_.
 
 ### Usage
 
-Create a Docker Swarm Cluster with three managers and two workers:
+Create a Docker Swarm cluster with three managers and two workers:
 
 ```bash
 # create a workspace
@@ -27,9 +27,10 @@ terraform apply \
 -var project=my-swarm-proj \
 -var region=europe-west3 \
 -var region_zone=europe-west3-a \
+-var manager_instance_count=3 \
 -var manager_machine_type=n1-standard-1 \
--var worker_machine_type=n1-standard-2 \
 -var worker_instance_count=2 \
+-var worker_machine_type=n1-standard-2 \
 -var docker_version=17.06.0~ce-0~ubuntu \
 -var docker_api_ip_allow=86.124.244.168
 ```
@@ -62,15 +63,10 @@ y2591911r9wyoixn4s882jd4n     swarm-manager-3     Ready               Active    
 If you don't create a workspace then you'll be running on the default one and your nods prefix will be `default`. 
 You can have multiple workspaces, each with it's own state, so you can run in parallel different Docker Swarm clusters.
 
-You can scale up or down the Docker Swarm Cluster by modifying the `worker_instance_count`. 
-On scale up, all new nodes will join the current cluster. 
-When you scale down the workers, Terraform will first drain the node 
-and remove it from the swarm before destroying the resources.
-
 After applying the Terraform plan you'll see several output variables like the public IPs of 
 each node and the current workspace. 
 You can use the manager public IP variable to connect to the Docker remote API 
-and lunch a service within the Swarm.
+and lunch a service within the swarm.
 
 ```bash
 $ export DOCKER_HOST=$(terraform output swarm_manager_ip)
@@ -89,4 +85,52 @@ Tear down the whole infrastructure with:
 terraform destroy -force
 ```
 
+### Scaling
+
+You can scale up or down the Docker Swarm cluster by modifying the `worker_instance_count`. 
+On scale up, all new nodes will join the current cluster. 
+When you scale down the workers, Terraform will first drain the node 
+and remove it from the swarm before destroying the resources.
+
+```bash
+# create the cluster with 2 workers
+terraform apply \
+-var project=my-swarm-proj \
+-var region=europe-west3 \
+-var region_zone=europe-west3-a \
+-var manager_instance_count=3 \
+-var worker_instance_count=2 
+
+# add one worker
+terraform apply \
+-var project=my-swarm-proj \
+-var region=europe-west3 \
+-var region_zone=europe-west3-a \
+-var manager_instance_count=3 \
+-var worker_instance_count=3
+
+# remove two worker
+terraform apply \
+-var project=my-swarm-proj \
+-var region=europe-west3 \
+-var region_zone=europe-west3-a \
+-var manager_instance_count=3 \
+-var worker_instance_count=1
+```
+
+The same scaling operations can be applied to manager nodes using the `manager_instance_count` variable, 
+always use an odd number of manager.
+
+```bash
+# add two managers
+terraform apply \
+-var project=my-swarm-proj \
+-var region=europe-west3 \
+-var region_zone=europe-west3-a \
+-var manager_instance_count=5 \
+-var worker_instance_count=2
+```
+
+When removing a manager, Terraform will execute `docker swarm leave --force` before destroying the resource, 
+this could break the cluster if there aren't enough managers to maintain a quorum. 
 
