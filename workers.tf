@@ -24,7 +24,7 @@ resource "google_compute_instance" "worker" {
   }
 
   service_account {
-    scopes = ["compute-ro", "storage-ro"]
+    scopes = ["cloud-platform"]
   }
 
   connection {
@@ -49,6 +49,8 @@ resource "google_compute_instance" "worker" {
       "sudo mv /tmp/docker.conf /etc/systemd/system/docker.service.d/docker.conf",
       "sudo chmod +x /tmp/install-docker-ce.sh",
       "sudo /tmp/install-docker-ce.sh ${var.docker_version}",
+      "curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh",
+      "sudo bash install-logging-agent.sh",
       "sudo docker swarm join --token ${data.external.swarm_tokens.result.worker} ${google_compute_instance.manager.0.network_interface.0.address}:2377",
     ]
   }

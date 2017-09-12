@@ -39,7 +39,7 @@ This will do the following:
 
 * creates a dedicated network and a firewall rule to allow internal traffic between swarm nodes
 * provisions 5 VMs with Ubuntu 16.04 LTS and a 50GB boot disk
-* starts the manager nodes and installs Docker CE via SSH
+* starts the manager nodes and installs Docker CE and the Stackdrive logging agent via SSH
 * customizes the Docker daemon systemd config by enabling the experimental features and the metrics endpoint
 * initializes the first manager node as the Docker Swarm leader and extracts the join tokens
 * starts the worker nodes in parallel and setups Docker CE the same as on the manager node
@@ -84,6 +84,15 @@ Tear down the whole infrastructure with:
 
  ```bash
 terraform destroy -force
+```
+
+The VMs logs are shipped to Stackdrive by the google-fluentd agent. 
+If you want to query Stackdrive for Docker engine demon errors and warnings you can use this filter:
+
+```bash
+resource.type:"gce_instance"
+textPayload:"dockerd"
+NOT textPayload:"level=info"
 ```
 
 ### Scaling
