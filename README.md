@@ -38,6 +38,7 @@ terraform apply \
 This will do the following:
 
 * creates a dedicated network and a firewall rule to allow internal traffic between swarm nodes
+* reserves a public IP for each manager node
 * provisions 5 VMs with Ubuntu 16.04 LTS and a 50GB boot disk
 * starts the manager nodes and installs Docker CE and the Stackdrive logging agent via SSH
 * customizes the Docker daemon systemd config by enabling the experimental features and the metrics endpoint
@@ -80,12 +81,6 @@ $ docker service create \
 $ curl $(terraform output swarm_manager_ip)
 ```
 
-Tear down the whole infrastructure with:
-
- ```bash
-terraform destroy -force
-```
-
 The VMs logs are shipped to Stackdrive by the google-fluentd agent. 
 If you want to query Stackdrive for Docker engine demon errors and warnings you can use this filter:
 
@@ -93,6 +88,12 @@ If you want to query Stackdrive for Docker engine demon errors and warnings you 
 resource.type:"gce_instance"
 textPayload:"dockerd"
 NOT textPayload:"level=info"
+```
+
+You can tear down the whole infrastructure with:
+
+ ```bash
+terraform destroy -force
 ```
 
 ### Scaling
@@ -142,5 +143,5 @@ terraform apply \
 ```
 
 When removing a manager, Terraform will execute `docker swarm leave --force` before destroying the resource, 
-this could break the cluster if there aren't enough managers to maintain a quorum. 
+this could break the cluster if there aren't enough managers left to maintain a quorum. 
 

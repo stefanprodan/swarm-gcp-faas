@@ -1,3 +1,8 @@
+resource "google_compute_address" "manager" {
+  count = 1
+  name = "${terraform.workspace}-manager-ip-${count.index + 1}"
+}
+
 resource "google_compute_instance" "manager" {
   count        = 1
   name         = "${terraform.workspace}-manager-${count.index + 1}"
@@ -16,7 +21,9 @@ resource "google_compute_instance" "manager" {
   network_interface {
     network = "${google_compute_network.swarm.name}"
 
-    access_config {}
+    access_config {
+      nat_ip = "${element(google_compute_address.manager.*.address, count.index)}"
+    }
   }
 
   metadata {
@@ -57,6 +64,11 @@ resource "google_compute_instance" "manager" {
   depends_on = ["google_compute_firewall.ssh", "google_compute_firewall.internal"]
 }
 
+resource "google_compute_address" "manager_follower" {
+  count = "${var.manager_instance_count - 1}"
+  name = "${terraform.workspace}-manager-ip-${count.index + 2}"
+}
+
 resource "google_compute_instance" "manager_follower" {
   count        = "${var.manager_instance_count - 1}"
   name         = "${terraform.workspace}-manager-${count.index + 2}"
@@ -75,7 +87,9 @@ resource "google_compute_instance" "manager_follower" {
   network_interface {
     network = "${google_compute_network.swarm.name}"
 
-    access_config {}
+    access_config {
+      nat_ip = "${element(google_compute_address.manager_follower.*.address, count.index)}"
+    }
   }
 
   metadata {
