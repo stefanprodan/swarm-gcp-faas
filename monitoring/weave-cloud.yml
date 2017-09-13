@@ -1,0 +1,108 @@
+version: "3.3"
+
+networks:
+  monitoring:
+    external: true
+
+volumes:
+    prometheus: {}
+    grafana: {}
+
+services:
+  dockerd-exporter:
+    image: stefanprodan/swarmprom-dockerd-exporter
+    networks:
+      - monitoring
+    environment:
+      - IN=172.18.0.1:9323
+      - OUT=9323
+    deploy:
+      mode: global
+
+  cadvisor:
+    image: google/cadvisor
+    networks:
+      - monitoring
+    command: -logtostderr -docker_only
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+
+  node-exporter:
+    image: stefanprodan/swarmprom-node-exporter
+    networks:
+      - monitoring
+    environment:
+      - NODE_ID={{.Node.ID}}
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/hostname:/etc/nodename
+    command:
+      - '-collector.textfile.directory=/etc/node-exporter/'
+      - '-collector.procfs=/host/proc'
+      - '-collector.sysfs=/host/sys'
+      - '-collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '-collectors.enabled=textfile,conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,time,vmstat'
+    deploy:
+      mode: global
+
+  scope-launcher:
+    image: stefanprodan/scope-swarm-launcher
+    networks:
+      - monitoring
+    command: scope launch --service-token=$TOKEN
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: global
+      restart_policy:
+        condition: none
+
+  prometheus:
+    image: stefanprodan/swarmprom-prometheus
+    networks:
+      - monitoring
+    environment:
+      - WEAVE_TOKEN=$TOKEN
+      #- JOBS=mongo-exporter:9216
+    command:
+      - '-config.file=/etc/prometheus/weave-cortex.yml'
+      - '-storage.local.path=/prometheus'
+      - '-web.console.libraries=/etc/prometheus/console_libraries'
+      - '-web.console.templates=/etc/prometheus/consoles'
+      - '-storage.local.target-heap-size=1073741824'
+      - '-storage.local.retention=24h'
+    volumes:
+      - prometheus:/prometheus
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == swarm-manager-1
+
+  grafana:
+    image: grafana/grafana:4.4.3
+    networks:
+      - monitoring
+    ports:
+      - 8080:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=$ADMIN_USER
+      - GF_SECURITY_ADMIN_PASSWORD=$ADMIN_PASSWORD
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana:/var/lib/grafana
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == swarm-manager-1
