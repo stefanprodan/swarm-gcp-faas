@@ -39,7 +39,20 @@ resource "google_compute_firewall" "http" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80", "8080", "443"]
+    ports    = ["80", "443"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["swarm"]
+}
+
+resource "google_compute_firewall" "management" {
+  name    = "${terraform.workspace}-management"
+  network = "${google_compute_network.swarm.name}"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080", "9000-9999"]
   }
 
   source_ranges = ["0.0.0.0/0"]
