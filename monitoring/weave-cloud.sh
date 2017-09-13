@@ -14,8 +14,8 @@ else
         docker network create --attachable -d overlay  $network
     fi
 
-    TOKEN=rh1dj7xbehb6zu1gynm9fjd1t65fhnqp
-    ADMIN_USER=admin
-    ADMIN_PASSWORD=admin
+    TOKEN=rh1dj7xbehb6zu1gynm9fjd1t65fhnqp \
+    ADMIN_USER=admin \
+    ADMIN_PASSWORD=admin \
     docker stack deploy -c weave-cloud.yml weave
 fi
