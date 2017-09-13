@@ -4,7 +4,7 @@ set -e
 
 #export DOCKER_HOST=$(terraform output swarm_manager_ip)
 
-if [ "$1" == "prune" ]; then
+if [ "$1" == "rm" ]; then
     docker stack rm weave
     sleep 5
     docker volume prune -f
