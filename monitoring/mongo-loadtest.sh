@@ -18,7 +18,7 @@ else
     echo ">>> Deploying MongoDB sharded cluster"
     docker stack deploy -c mongo-cluster.yml mongo
 
-    echo && echo ">>> Waiting for MongoDB cluster bootstrap"
+    echo && echo ">>> Waiting for MongoDB cluster bootstrap to finish"
     while true; do
         curl -sS http://${DOCKER_HOST}:9090 2>/dev/null && break
         sleep 1
@@ -27,7 +27,8 @@ else
     echo && echo ">>> MongoDB cluster is ready, deploying load test app"
     docker stack deploy -c mongo-loadtest.yml app
 
-    echo && echo ">>> Running load test 100K read/write operations"
+    echo && echo ">>> Running load test with 100K read/write operations"
     go get -u github.com/rakyll/hey
+    sleep 5
     hey -n 100000 -c 100 -m GET http://${DOCKER_HOST}:9990/
 fi
