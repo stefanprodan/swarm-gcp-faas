@@ -1,13 +1,14 @@
 variable "docker_version" {
-  default = "17.06.0~ce-0~ubuntu"
+  default = "17.06.2~ce-0~ubuntu"
 }
 
 variable "region" {
   default = "europe-west3"
 }
 
-variable "region_zone" {
-  default = "europe-west3-a"
+variable "zones" {
+  type    = "list"
+  default = ["europe-west3-a", "europe-west3-b", "europe-west3-c"]
 }
 
 variable "project" {
@@ -35,13 +36,13 @@ variable "worker_machine_type" {
 }
 
 variable "worker_instance_count" {
-  default = 2
+  default = 3
 }
 
 variable "docker_api_ip" {
   default = "0.0.0.0"
 }
 
-variable "docker_api_ip_allow" {
+variable "management_ip_range" {
   default = "86.120.86.211"
 }

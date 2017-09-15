@@ -55,7 +55,7 @@ resource "google_compute_firewall" "management" {
     ports    = ["8080", "9000-9999"]
   }
 
-  source_ranges = ["${var.docker_api_ip_allow}"]
+  source_ranges = ["${var.management_ip_range}"]
   target_tags   = ["swarm"]
 }
 
@@ -68,6 +68,6 @@ resource "google_compute_firewall" "docker" {
     ports    = ["2375"]
   }
 
-  source_ranges = ["${var.docker_api_ip_allow}"]
+  source_ranges = ["${var.management_ip_range}"]
   target_tags   = ["swarm"]
 }

@@ -1,13 +1,13 @@
 resource "google_compute_address" "manager" {
   count = 1
-  name = "${terraform.workspace}-manager-ip-${count.index + 1}"
+  name  = "${terraform.workspace}-manager-ip-${count.index + 1}"
 }
 
 resource "google_compute_instance" "manager" {
   count        = 1
   name         = "${terraform.workspace}-manager-${count.index + 1}"
   machine_type = "${var.manager_machine_type}"
-  zone         = "${var.region_zone}"
+  zone         = "${element(var.zones, count.index)}"
 
   tags = ["swarm", "manager"]
 
@@ -66,14 +66,14 @@ resource "google_compute_instance" "manager" {
 
 resource "google_compute_address" "manager_follower" {
   count = "${var.manager_instance_count - 1}"
-  name = "${terraform.workspace}-manager-ip-${count.index + 2}"
+  name  = "${terraform.workspace}-manager-ip-${count.index + 2}"
 }
 
 resource "google_compute_instance" "manager_follower" {
   count        = "${var.manager_instance_count - 1}"
   name         = "${terraform.workspace}-manager-${count.index + 2}"
   machine_type = "${var.manager_machine_type}"
-  zone         = "${var.region_zone}"
+  zone         = "${element(var.zones, count.index + 1)}"
 
   tags = ["swarm", "manager"]
 
