@@ -49,7 +49,7 @@ This will do the following:
 The naming convention for a swarm node is in `<WORKSPACE>-<ROLE>-<INDEX>` format, 
 running the project on workspace swarm will create 6 nodes distributed across three zones: 
 
-![vms](https://github.com/stefanprodan/mongo-swarm/blob/master/screens/gcp-vms.png)
+![vms](https://github.com/stefanprodan/swarm-gcp/blob/master/screens/gcp-vms.png)
 
 ```bash
 $ docker node ls
