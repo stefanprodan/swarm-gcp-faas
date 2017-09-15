@@ -23,8 +23,8 @@ variable "manager_machine_type" {
   default = "n1-standard-1"
 }
 
-variable "ssh_user" {
-  default = "ubuntu"
+variable "manager_disk_size" {
+  default = "50"
 }
 
 variable "manager_instance_count" {
@@ -33,6 +33,10 @@ variable "manager_instance_count" {
 
 variable "worker_machine_type" {
   default = "n1-standard-1"
+}
+
+variable "worker_disk_size" {
+  default = "50"
 }
 
 variable "worker_instance_count" {
@@ -45,4 +49,8 @@ variable "docker_api_ip" {
 
 variable "management_ip_range" {
   default = "86.120.86.211"
+}
+
+variable "ssh_user" {
+  default = "ubuntu"
 }

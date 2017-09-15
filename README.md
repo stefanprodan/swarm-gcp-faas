@@ -27,8 +27,10 @@ terraform apply \
 -var project=my-swarm-proj \
 -var manager_instance_count=3 \
 -var manager_machine_type=n1-standard-1 \
+-var manager_disk_size=50 \
 -var worker_instance_count=3 \
 -var worker_machine_type=n1-standard-2 \
+-var worker_disk_size=50 \
 -var docker_version=17.06.2~ce-0~ubuntu \
 -var management_ip_range=35.198.189.7
 ```

@@ -9,7 +9,7 @@ resource "google_compute_instance" "worker" {
   boot_disk {
     initialize_params {
       image = "${var.machine_image}"
-      size  = "50"
+      size  = "${var.worker_disk_size}"
     }
   }
 

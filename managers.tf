@@ -14,7 +14,7 @@ resource "google_compute_instance" "manager" {
   boot_disk {
     initialize_params {
       image = "${var.machine_image}"
-      size  = "50"
+      size  = "${var.manager_disk_size}"
     }
   }
 
@@ -80,7 +80,7 @@ resource "google_compute_instance" "manager_follower" {
   boot_disk {
     initialize_params {
       image = "${var.machine_image}"
-      size  = "50"
+      size  = "${var.manager_disk_size}"
     }
   }
 
