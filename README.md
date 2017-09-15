@@ -17,7 +17,7 @@ Add your SSH key under _Compute Engine -> Metadata -> SSH Keys_.
 
 ### Usage
 
-Create a Docker Swarm cluster with three managers and two workers:
+Create a Docker Swarm cluster with three managers and three workers:
 
 ```bash
 # create a workspace
@@ -25,45 +25,53 @@ terraform workspace new swarm
 
 terraform apply \
 -var project=my-swarm-proj \
--var region=europe-west3 \
--var region_zone=europe-west3-a \
 -var manager_instance_count=3 \
 -var manager_machine_type=n1-standard-1 \
--var worker_instance_count=2 \
+-var worker_instance_count=3 \
 -var worker_machine_type=n1-standard-2 \
--var docker_version=17.06.0~ce-0~ubuntu \
--var docker_api_ip_allow=86.124.244.168
+-var docker_version=17.06.2~ce-0~ubuntu \
+-var management_ip_range=35.198.189.7
 ```
 
 This will do the following:
 
 * creates a dedicated network and a firewall rule to allow internal traffic between swarm nodes
 * reserves a public IP for each manager node
-* provisions 5 VMs with Ubuntu 16.04 LTS and a 50GB boot disk
+* provisions 6 VMs with Ubuntu 16.04 LTS and a 50GB boot disk
 * starts the manager nodes and installs Docker CE and the Stackdrive logging agent via SSH
 * customizes the Docker daemon systemd config by enabling the experimental features and the metrics endpoint
 * initializes the first manager node as the Docker Swarm leader and extracts the join tokens
 * starts the worker nodes in parallel and setups Docker CE the same as on the manager node
 * joins the worker nodes in the cluster using the manager node private IP
 * creates a firewall rule to allow HTTP/S inbound traffic on all nodes
-* allows traffic to the Docker remote API only from the IP specified with `docker_api_ip_allow`
+* allows traffic to the Docker remote API only from the IP specified with `management_ip_range`
 
 The naming convention for a swarm node is in `<WORKSPACE>-<ROLE>-<INDEX>` format, 
-running the project on workspace swarm will create 5 nodes: 
+running the project on workspace swarm will create 6 nodes distributed across three zones: 
+
+![vms](https://github.com/stefanprodan/mongo-swarm/blob/master/screens/gcp-vms.png)
 
 ```bash
 $ docker node ls
 
 ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS
-6q1or4id4op57aj7kq00dco0e *   swarm-manager-1     Ready               Active              Leader             
-sm8dpqdkcubvbxv1saitr4ram     swarm-manager-2     Ready               Active              Reachable
-y2591911r9wyoixn4s882jd4n     swarm-manager-3     Ready               Active              Reachable
-3j31a7ik1fh4k7tl77hmu0c9z     swarm-worker-1      Ready               Active              
-7xdn89455js9aea28yezo7dt1     swarm-worker-2      Ready               Active 
+4c1wrv1fw78qo81h98ox1soij *   swarm-manager-1     Ready               Active              Leader             
+4c1wrv1fw78qo81h98ox1soij     swarm-manager-2     Ready               Active              Reachable
+axxu7bhhtn96pz7cu1udlhub0     swarm-manager-3     Ready               Active              Reachable
+lqpdwnum0lt8rr0w2u6enudu7     swarm-worker-1      Ready               Active              
+mhjb760b7a11d0fdqi48tdit4     swarm-worker-2      Ready               Active 
+yv27bmn1wfrpy7wuvl603z07i     swarm-worker-3      Ready               Active
 ```
 
 If you don't create a workspace then you'll be running on the default one and your nods prefix will be `default`. 
 You can have multiple workspaces, each with it's own state, so you can run in parallel different Docker Swarm clusters.
+
+With these environment variables you can change the region and zones:
+
+```bash
+TF_VAR_region=us-central1
+TF_VAR_zones='["us-central1-b", "us-central1-c", "us-central1-f"]'
+```
 
 After applying the Terraform plan you'll see several output variables like the public IPs of 
 each node and the current workspace. 
