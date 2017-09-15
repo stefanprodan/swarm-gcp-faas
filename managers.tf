@@ -123,7 +123,7 @@ resource "google_compute_instance" "manager_follower" {
       "sudo /tmp/install-docker-ce.sh ${var.docker_version}",
       "curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh",
       "sudo bash install-logging-agent.sh",
-      "sudo docker swarm join --token ${data.external.swarm_tokens.result.manager} ${google_compute_instance.manager.0.network_interface.0.address}:2377",
+      "sudo docker swarm join --token ${data.external.swarm_tokens.result.manager} ${google_compute_instance.manager.0.name}:2377",
     ]
   }
 
