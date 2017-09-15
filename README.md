@@ -117,25 +117,16 @@ and remove it from the swarm before destroying the resources.
 # create the cluster with 2 workers
 terraform apply \
 -var project=my-swarm-proj \
--var region=europe-west3 \
--var region_zone=europe-west3-a \
--var manager_instance_count=3 \
 -var worker_instance_count=2 
 
 # add one worker
 terraform apply \
 -var project=my-swarm-proj \
--var region=europe-west3 \
--var region_zone=europe-west3-a \
--var manager_instance_count=3 \
 -var worker_instance_count=3
 
 # remove two workers
 terraform apply \
 -var project=my-swarm-proj \
--var region=europe-west3 \
--var region_zone=europe-west3-a \
--var manager_instance_count=3 \
 -var worker_instance_count=1
 ```
 
@@ -146,10 +137,7 @@ always use an odd number of manager.
 # add two managers
 terraform apply \
 -var project=my-swarm-proj \
--var region=europe-west3 \
--var region_zone=europe-west3-a \
--var manager_instance_count=5 \
--var worker_instance_count=2
+-var manager_instance_count=5
 ```
 
 When removing a manager, Terraform will execute `docker swarm leave --force` before destroying the resource, 
