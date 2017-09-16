@@ -54,3 +54,19 @@ variable "management_ip_range" {
 variable "ssh_user" {
   default = "ubuntu"
 }
+
+variable "enable_dns" {
+  default = "false"
+}
+
+variable "domain" {
+  default = "weavedx.com."
+}
+
+variable "subdomain" {
+  default = "swarm.weavedx.com."
+}
+
+variable "dns_zone" {
+  default = "swarm-zone"
+}
