@@ -4,6 +4,9 @@ networks:
   net:
     driver: overlay
 
+volumes:
+  acme: {}
+
 services:
 
   traefik:
@@ -19,7 +22,16 @@ services:
       - '--docker.watch'
       - '--web'
       - '--logLevel=DEBUG'
+      - '--entryPoints="Name:http Address::80 Redirect.EntryPoint:https"'
+      - '--entryPoints="Name:https Address::443 TLS"'
+      - '--defaultEntryPoints=http,https'
+      - '--acme.entryPoint=https'
+      - '--acme.email=stefan@weave.works'
+      - '--acme.storage=/etc/traefik/acme/acme.json'
+      - '--acme.domains=portainer.weavedx.com'
+      - '--acme.onHostRule=true'
     volumes:
+      - acme:/etc/traefik/acme
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - net
@@ -43,7 +55,7 @@ services:
         - "traefik.docker.network=lb_net"
         - "traefik.backend.loadbalancer.swarm=true"
         - "traefik.backend=portainer"
-        - "traefik.frontend.entryPoints=http"
+        - "traefik.frontend.entryPoints=https"
         - "traefik.frontend.rule=Host:portainer.weavedx.com"
       mode: replicated
       replicas: 1
