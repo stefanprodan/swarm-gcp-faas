@@ -52,7 +52,7 @@ resource "google_compute_firewall" "management" {
 
   allow {
     protocol = "tcp"
-    ports    = ["8080", "9000-9999"]
+    ports    = ["1-65535"]
   }
 
   source_ranges = ["${var.management_ip_range}"]
