@@ -8,6 +8,10 @@ volumes:
     prometheus: {}
     grafana: {}
 
+configs:
+  prom_config:
+    file: ./weave-cortex.yml
+
 services:
   dockerd-exporter:
     image: stefanprodan/swarmprom-dockerd-exporter
@@ -66,12 +70,12 @@ services:
         condition: none
 
   prometheus:
-    image: stefanprodan/swarmprom-prometheus
+    image: prom/prometheus
     networks:
       - monitoring
-    environment:
-      - WEAVE_TOKEN=$TOKEN
-      #- JOBS=mongo-exporter:9216
+#    environment:
+#      - WEAVE_TOKEN=$TOKEN
+#      - JOBS=mongo-exporter:9216
     command:
       - '-config.file=/etc/prometheus/weave-cortex.yml'
       - '-storage.local.path=/prometheus'
@@ -81,6 +85,9 @@ services:
       - '-storage.local.retention=24h'
     volumes:
       - prometheus:/prometheus
+    configs:
+      - source: prom_config
+        target: /etc/prometheus/weave-cortex.yml
     deploy:
       mode: replicated
       replicas: 1
@@ -93,7 +100,7 @@ services:
     networks:
       - monitoring
     ports:
-      - 8080:3000
+      - 3000:3000
     environment:
       - GF_SECURITY_ADMIN_USER=$ADMIN_USER
       - GF_SECURITY_ADMIN_PASSWORD=$ADMIN_PASSWORD
