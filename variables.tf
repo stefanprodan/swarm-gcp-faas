@@ -48,7 +48,7 @@ variable "docker_api_ip" {
 }
 
 variable "management_ip_range" {
-  default = "86.120.86.211"
+  default = "37.157.33.76"
 }
 
 variable "ssh_user" {
@@ -56,7 +56,7 @@ variable "ssh_user" {
 }
 
 variable "enable_dns" {
-  default = "false"
+  default = "true"
 }
 
 variable "domain" {
@@ -64,7 +64,7 @@ variable "domain" {
 }
 
 variable "subdomain" {
-  default = "swarm.weavedx.com."
+  default = "*.weavedx.com."
 }
 
 variable "dns_zone" {
