@@ -1,5 +1,5 @@
 variable "docker_version" {
-  default = "17.06.2~ce-0~ubuntu"
+  default = "17.09.0~ce-0~ubuntu"
 }
 
 variable "region" {
@@ -48,7 +48,7 @@ variable "docker_api_ip" {
 }
 
 variable "management_ip_range" {
-  default = "37.157.33.76"
+  default = "188.25.19.30"
 }
 
 variable "ssh_user" {
