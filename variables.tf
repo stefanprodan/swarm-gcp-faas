@@ -48,7 +48,7 @@ variable "docker_api_ip" {
 }
 
 variable "management_ip_range" {
-  default = "188.25.19.30"
+  default = "188.25.14.196"
 }
 
 variable "ssh_user" {

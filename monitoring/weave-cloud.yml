@@ -58,7 +58,7 @@ services:
       mode: global
 
   scope-launcher:
-    image: stefanprodan/scope-swarm-launcher
+    image: weaveworks/scope-swarm-launcher
     networks:
       - monitoring
     command: scope launch --service-token=$TOKEN
