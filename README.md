@@ -143,3 +143,32 @@ terraform apply \
 When removing a manager, Terraform will execute `docker swarm leave --force` before destroying the resource, 
 this could break the cluster if there aren't enough managers left to maintain a quorum. 
 
+### Weave Scope setup
+
+Now that you have a Docker Swarm cluster up and running you can start monitoring it with Weave Scope. 
+You'll need a Weave Could service token, if you don't have a Weave token go 
+to [Weave Cloud](https://cloud.weave.works/) and sign up for a Weave Cloud account. 
+
+In order to visualize the Swarm cluster with Weave Cloud you have to deploy the Weave Scope container 
+on each Swarm node. Scope needs to run with privileged mode and because Swarm services don't support 
+privileged mode you'll have to use a one-shot service that will provision each node with a Scope container.
+
+```bash
+docker service create --name scope-launcher --mode global --detach \
+    --restart-condition none \
+    --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+    weaveworks/scope-swarm-launcher \
+    scope launch --service-token=<WEAVE-CLOUD-TOKEN>
+```
+
+The launcher will install Scope on each server and will exit. Using `--restart-condition none` we 
+instruct Docker Swarm not to restart the service after it exits. With `--mode global` we make sure 
+Scope will be automatically deployed on new servers as you add them to the swarm. 
+
+Once the Scope containers are running on all hosts you can login into Weave Cloud and inspect your cluster.
+
+![Scope Hosts](https://raw.githubusercontent.com/stefanprodan/swarmprom/master/grafana/screens/weave-scope-hosts-v2.png)
+
+Scope offers remote access to the Swarm’s nods and containers, making it easy to diagnose issues in real-time. 
+You can view metrics and metadata of the running processes, tasks, services, stacks and networks. 
+
