@@ -1,0 +1,96 @@
+version: "3.3"
+
+networks:
+  net:
+    driver: overlay
+    attachable: true
+
+configs:
+  prom_config:
+    file: ./prometheus/weave-cortex.yml
+  prom_entrypoint:
+    file: ./prometheus/docker-entrypoint.sh
+  prom_rules:
+    file: ./prometheus/alert.rules
+  alertmanager_config:
+    file: ./alertmanager/alertmanager.yml
+
+services:
+  gateway:
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - 80:8080
+    image: functions/gateway:0.6.5
+    networks:
+      - net
+    deploy:
+      placement:
+        constraints:
+          - 'node.role == manager'
+
+  prometheus:
+    image: prom/prometheus:v1.7.2
+    configs:
+      - source: prom_entrypoint
+        target: /etc/prometheus/docker-entrypoint.sh
+        mode: 0550
+      - source: prom_config
+        target: /etc/prometheus/weave-cortex.yml
+      - source: prom_rules
+        target: /etc/prometheus/alert.rules
+    entrypoint:
+      - '/etc/prometheus/docker-entrypoint.sh'
+    command:
+      - '-config.file=/etc/prometheus/prometheus.yml'
+      - '-storage.local.path=/prometheus'
+      - '-web.console.libraries=/etc/prometheus/console_libraries'
+      - '-web.console.templates=/etc/prometheus/consoles'
+      - '-storage.local.target-heap-size=1073741824'
+      - '-storage.local.retention=24h'
+      - '-alertmanager.url=http://alertmanager:9093'
+    environment:
+      - WEAVE_TOKEN=$TOKEN
+      - no_proxy=gateway
+    networks:
+      - net
+    ports:
+      - 9090:9090
+    deploy:
+      placement:
+        constraints:
+          - 'node.role != manager'
+
+  alertmanager:
+    image: prom/alertmanager:v0.9.1
+    configs:
+      - source: alertmanager_config
+        target: /etc/alertmanager/alertmanager.yml
+    command:
+      - '-config.file=/etc/alertmanager/alertmanager.yml'
+      - '-storage.path=/alertmanager'
+    environment:
+      no_proxy: "gateway"
+    networks:
+      - net
+    ports:
+      - 9093:9093
+    deploy:
+      placement:
+        constraints:
+          - 'node.role != manager'
+
+  echoit:
+    image: functions/alpine:health
+    labels:
+      function: "true"
+    networks:
+      - net
+    environment:
+      fprocess: "cat"
+      no_proxy: "gateway"
+      https_proxy: $https_proxy
+    deploy:
+      placement:
+        constraints:
+          - 'node.role != manager'
