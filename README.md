@@ -53,17 +53,6 @@ running the project on workspace swarm will create 6 nodes distributed across th
 
 ![vms](https://github.com/stefanprodan/swarm-gcp/blob/master/screens/gcp-vms.png)
 
-```bash
-$ docker node ls
-
-ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS
-4c1wrv1fw78qo81h98ox1soij *   swarm-manager-1     Ready               Active              Leader             
-4c1wrv1fw78qo81h98ox1soij     swarm-manager-2     Ready               Active              Reachable
-axxu7bhhtn96pz7cu1udlhub0     swarm-manager-3     Ready               Active              Reachable
-lqpdwnum0lt8rr0w2u6enudu7     swarm-worker-1      Ready               Active              
-mhjb760b7a11d0fdqi48tdit4     swarm-worker-2      Ready               Active 
-yv27bmn1wfrpy7wuvl603z07i     swarm-worker-3      Ready               Active
-```
 
 If you don't create a workspace then you'll be running on the default one and your nods prefix will be `default`. 
 You can have multiple workspaces, each with it's own state, so you can run in parallel different Docker Swarm clusters.
@@ -78,17 +67,20 @@ TF_VAR_zones='["us-central1-b", "us-central1-c", "us-central1-f"]'
 After applying the Terraform plan you'll see several output variables like the public IPs of 
 each node and the current workspace. 
 You can use the manager public IP variable to connect to the Docker remote API 
-and lunch a service within the swarm.
+and run docker swarm commands.
 
 ```bash
 $ export DOCKER_HOST=$(terraform output swarm_manager_ip)
 
-$ docker service create \
-    --name nginx -dp 80:80 \
-    --replicas 6 \
-    --constraint 'node.role == worker' nginx
+$ docker node ls
 
-$ curl $(terraform output swarm_manager_ip)
+ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS
+4c1wrv1fw78qo81h98ox1soij *   swarm-manager-1     Ready               Active              Leader
+4c1wrv1fw78qo81h98ox1soij     swarm-manager-2     Ready               Active              Reachable
+axxu7bhhtn96pz7cu1udlhub0     swarm-manager-3     Ready               Active              Reachable
+lqpdwnum0lt8rr0w2u6enudu7     swarm-worker-1      Ready               Active
+mhjb760b7a11d0fdqi48tdit4     swarm-worker-2      Ready               Active
+yv27bmn1wfrpy7wuvl603z07i     swarm-worker-3      Ready               Active
 ```
 
 The VMs logs are shipped to Stackdrive by the google-fluentd agent. 
@@ -171,4 +163,42 @@ Once the Scope containers are running on all hosts you can login into Weave Clou
 
 Scope offers remote access to the Swarm’s nods and containers, making it easy to diagnose issues in real-time. 
 You can view metrics and metadata of the running processes, tasks, services, stacks and networks. 
+
+### OpenFaaS setup
+
+[OpenFaaS](https://www.openfaas.com/) is a framework for building serverless functions with Docker which has 
+first class support for metrics. Any process can be packaged as a function enabling you to consume a 
+range of web events without repetitive boiler-plate coding.
+
+Deploy OpenFaaS instrumented with Weave Cloud:
+
+```bash
+$ export DOCKER_HOST=$(terraform output swarm_manager_ip)
+$ cd openfaas
+$ WEAVE_TOKEN=<WEAVE-CLOUD-TOKEN> docker stack deploy -c docker-compose.yml faas
+
+Creating network faas_net
+Creating service faas_prometheus
+Creating service faas_alertmanager
+Creating service faas_echoit
+Creating service faas_gateway
+```
+
+Check if OpenFaaS is working by accessing `http://<SWARM-PUBLIC-IP>`. 
+Now that you have OpenFaaS running let's run a load test to see the auto scaling in action.
+
+You can run the load test using rakyll/hey or Apache bench.
+
+```bash
+#install hey
+go get -u github.com/rakyll/hey
+
+#do 10K requests 
+hey -n 10000 -c 2 -m POST -d "test" http://<SWARM-PUBLIC-IP>/function/faas_echoit
+```
+
+In the Weave Cloud UI under Explore you'll see how OpenFaaS scales up the echoit service:
+
+![scope](https://github.com/stefanprodan/swarm-gcp/blob/master/screens/openfaas-scope.png)
+
 
