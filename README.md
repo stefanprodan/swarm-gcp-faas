@@ -181,22 +181,20 @@ Deploy OpenFaaS instrumented with Weave Cloud:
 ```bash
 $ export DOCKER_HOST=$(terraform output swarm_manager_ip)
 $ cd openfaas
-$ WEAVE_TOKEN=<WEAVE-CLOUD-TOKEN> docker stack deploy -c docker-compose.yml faas
 
-Creating network faas_net
-Creating service faas_prometheus
-Creating service faas_alertmanager
-Creating service faas_echoit
-Creating service faas_gateway
+WEAVE_TOKEN=<WEAVE-CLOUD-TOKEN> \
+USER=admin \
+PASSWORD=admin \ 
+docker stack deploy -c docker-compose.yml faas
 ```
 
 This will do the following:
 
-* creates Docker configs for Prometheus and Alermanager 
+* creates Docker configs for Prometheus, Alermanager and Caddy
 * configures Prometheus with Weave Cloud remote write
 * deploys Prometheus, Alermanager and the echoit function on worker nodes
 * deploys the OpenFaaS gateway on a manager node
-* exposes the gateway outside the Swarm on port 80
+* deploys Caddy FOSS reverse proxy with basic auth for Prometheus, Alermanager and OpenFaaS Gateway
 
 Check if OpenFaaS is working by accessing `http://<SWARM-PUBLIC-IP>`. 
 Now that you have OpenFaaS running let's do a load test to see the auto scaling in action.
@@ -208,7 +206,7 @@ You can run the load test using rakyll/hey or Apache bench.
 go get -u github.com/rakyll/hey
 
 #do 10K requests 
-hey -n 10000 -c 2 -m POST -d "test" http://<SWARM-PUBLIC-IP>/function/faas_echoit
+hey -n 10000 -c 2 -m POST -d "test" http://USER:PASSWORD@<SWARM-PUBLIC-IP>/function/faas_echoit
 ```
 
 In the Weave Cloud UI under Explore you'll see how OpenFaaS scales up the echoit service:
