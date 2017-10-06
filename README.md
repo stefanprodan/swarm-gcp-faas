@@ -167,8 +167,9 @@ You can view metrics and metadata of the running processes, tasks, services, sta
 ### OpenFaaS setup
 
 [OpenFaaS](https://www.openfaas.com/) is a framework for building serverless functions with Docker which has 
-first class support for metrics. Any process can be packaged as a function enabling you to consume a 
-range of web events without repetitive boiler-plate coding.
+first class support for metrics. The GCP Cloud functions are limited to nodejs but with OpenFaaS any process 
+can be packaged as a function. If you want to write functions in Go this is the perfect framework to do that, 
+here is an example to get you started [BaseFunctions/golang](https://github.com/openfaas/faas/tree/master/sample-functions/BaseFunctions/golang). 
 
 Deploy OpenFaaS instrumented with Weave Cloud:
 
@@ -184,8 +185,16 @@ Creating service faas_echoit
 Creating service faas_gateway
 ```
 
+This will do the following:
+
+* creates Docker configs for Prometheus and Alermanager 
+* configures Prometheus with Weave Cloud remote write
+* deploys Prometheus, Alermanager and the echoit function on worker nodes
+* deploys the OpenFaaS gateway on a manager node
+* exposes the gateway outside the Swarm on port 80
+
 Check if OpenFaaS is working by accessing `http://<SWARM-PUBLIC-IP>`. 
-Now that you have OpenFaaS running let's run a load test to see the auto scaling in action.
+Now that you have OpenFaaS running let's do a load test to see the auto scaling in action.
 
 You can run the load test using rakyll/hey or Apache bench.
 
@@ -201,4 +210,12 @@ In the Weave Cloud UI under Explore you'll see how OpenFaaS scales up the echoit
 
 ![scope](https://github.com/stefanprodan/swarm-gcp/blob/master/screens/openfaas-scope.png)
 
+Weave Cloud extends Prometheus by providing a distributed, multi-tenant, horizontally scalable version of Prometheus. 
+It hosts the scraped Prometheus metrics for you, so that you don’t have to worry about storage or backups.
 
+You can monitor your OpenFaaS setup by writing PromQL queries in the Weave Cloud Monitor GUI:
+
+![cortex](https://github.com/stefanprodan/swarm-gcp/blob/master/screens/openfaas-metrics.png)
+
+If you need more than what the Weave Cloud GUI offers, a Grafana Dashboard browser plugin is available that can be 
+downloaded from the [Google Chrome store](https://chrome.google.com/webstore/detail/weave-cloud/aihaocdgpjomchhocbnlhoaildnoollo).
