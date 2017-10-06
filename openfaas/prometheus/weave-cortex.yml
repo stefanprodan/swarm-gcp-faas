@@ -1,0 +1,29 @@
+remote_write:
+- url: https://cloud.weave.works/api/prom/push
+  basic_auth:
+    #password: <token>#
+
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+
+  external_labels:
+    monitor: 'faas-monitor'
+
+rule_files:
+    - 'alert.rules'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: "gateway"
+    scrape_interval: 5s
+    dns_sd_configs:
+      - names: ['tasks.gateway']
+        port: 8080
+        type: A
+        refresh_interval: 5s
