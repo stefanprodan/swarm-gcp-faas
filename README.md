@@ -1,6 +1,9 @@
 # swarm-gcp
 
-Automating Docker Swarm cluster operations with Terraform GCP provider.
+This project shows how you can create a Docker Swarm cluster on Google Cloud with Terraform, 
+run OpenFaaS on top of Swarm and instrument everything with Weave Cloud Scope and Prometheus.
+
+### Install
 
 Clone the repository and install the dependencies:
 
@@ -15,7 +18,7 @@ Go to _Google Cloud Platform -> API Manager -> Credentials -> Create Credentials
 chose JSON as key type. Rename the file to `account.json` and put it in the project root next to `main.tf`.
 Add your SSH key under _Compute Engine -> Metadata -> SSH Keys_.
 
-### Usage
+### Docker Swarm bootstrap
 
 Create a Docker Swarm cluster with three managers and three workers:
 
@@ -98,7 +101,7 @@ You can tear down the whole infrastructure with:
 terraform destroy -force
 ```
 
-### Scaling
+### Docker Swarm node scaling
 
 You can scale up or down the Docker Swarm cluster by modifying the `worker_instance_count`. 
 On scale up, all new nodes will join the current cluster. 
@@ -146,6 +149,8 @@ on each Swarm node. Scope needs to run with privileged mode and because Swarm se
 privileged mode you'll have to use a one-shot service that will provision each node with a Scope container.
 
 ```bash
+$ export DOCKER_HOST=$(terraform output swarm_manager_ip)
+
 docker service create --name scope-launcher --mode global --detach \
     --restart-condition none \
     --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
