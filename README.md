@@ -1,4 +1,4 @@
-# swarm-gcp
+# swarm-gcp-faas
 
 This project shows how you can create a Docker Swarm cluster on Google Cloud with Terraform, 
 run OpenFaaS on top of Swarm and instrument everything with Weave Cloud Scope and Prometheus.
@@ -8,8 +8,8 @@ run OpenFaaS on top of Swarm and instrument everything with Weave Cloud Scope an
 Clone the repository and install the dependencies:
 
 ```bash
-$ git clone https://github.com/stefanprodan/swarm-gcp.git
-$ cd swarm-gcp
+$ git clone https://github.com/stefanprodan/swarm-gcp-faas.git
+$ cd swarm-gcp-faas
 $ terraform init
 ```
 
