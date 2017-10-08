@@ -174,7 +174,7 @@ You can view metrics and metadata of the running processes, tasks, services, sta
 [OpenFaaS](https://www.openfaas.com/) is a framework for building serverless functions with Docker which has 
 first class support for metrics. The GCP Cloud functions are limited to nodejs but with OpenFaaS any process 
 can be packaged as a function. If you want to write functions in Go this is the perfect framework to do that, 
-here is an example to get you started [BaseFunctions/golang](https://github.com/openfaas/faas/tree/master/sample-functions/BaseFunctions/golang). 
+here is an example to get you started [Serverless Golang](https://blog.alexellis.io/serverless-golang-with-openfaas/). 
 
 Deploy OpenFaaS instrumented with Weave Cloud:
 
