@@ -1,4 +1,5 @@
 provider "google" {
+  version     = "0.1.3"
   credentials = "${file("account.json")}"
   project     = "${var.project}"
   region      = "${var.region}"

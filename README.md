@@ -16,7 +16,8 @@ $ terraform init
 Before running the project you'll have to create a GCP service account key. 
 Go to _Google Cloud Platform -> API Manager -> Credentials -> Create Credentials -> Service account key_ and 
 chose JSON as key type. Rename the file to `account.json` and put it in the project root next to `main.tf`.
-Add your SSH key under _Compute Engine -> Metadata -> SSH Keys_.
+Add your SSH key under _Compute Engine -> Metadata -> SSH Keys_, also create a metadata entry named `sshKeys` 
+with your public SSH key as value.
 
 ### Docker Swarm bootstrap
 
