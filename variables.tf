@@ -1,5 +1,5 @@
 variable "docker_version" {
-  default = "17.09.0~ce-0~ubuntu"
+  default = "17.09.1~ce-0~ubuntu"
 }
 
 variable "region" {
@@ -28,11 +28,11 @@ variable "manager_disk_size" {
 }
 
 variable "manager_instance_count" {
-  default = 3
+  default = 1
 }
 
 variable "worker_machine_type" {
-  default = "n1-standard-1"
+  default = "n1-standard-2"
 }
 
 variable "worker_disk_size" {
@@ -48,7 +48,7 @@ variable "docker_api_ip" {
 }
 
 variable "management_ip_range" {
-  default = "188.25.14.196"
+  default = "82.77.164.25"
 }
 
 variable "ssh_user" {
