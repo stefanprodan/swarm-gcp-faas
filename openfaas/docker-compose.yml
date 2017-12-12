@@ -19,12 +19,50 @@ configs:
 
 services:
   gateway:
+    image: functions/gateway:0.6.7
+    environment:
+      faas_nats_address: "nats"
+      faas_nats_port: 4222
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 20
+        window: 380s
+    networks:
+      - net
+    ports:
+      - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-    image: functions/gateway:0.6.5
+    deploy:
+      placement:
+        constraints:
+          - 'node.role == manager'
+
+  nats:
+    image: nats-streaming:0.5.0
+    ports:
+      - 4222:4222
+      - 8222:8222
+    command: "--store memory --cluster_id faas-cluster"
     networks:
       - net
     deploy:
+      placement:
+        constraints:
+          - 'node.role == manager'
+
+  queue-worker:
+    image: functions/queue-worker:0.1.1
+    networks:
+        - net
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 20
+        window: 380s
       placement:
         constraints:
           - 'node.role == manager'
@@ -85,8 +123,11 @@ services:
     environment:
       fprocess: "cat"
       no_proxy: "gateway"
+      com.faas.max_replicas: "20"
       https_proxy: $https_proxy
     deploy:
+      mode: replicated
+      replicas: 10
       placement:
         constraints:
           - 'node.role != manager'
