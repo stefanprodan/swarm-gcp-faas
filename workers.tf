@@ -42,9 +42,11 @@ resource "google_compute_instance" "worker" {
     destination = "/tmp/install-docker-ce.sh"
   }
 
-  # install DOcker and join the swarm
+  # install Docker and join the swarm
   provisioner "remote-exec" {
     inline = [
+      "sudo sysctl -w vm.max_map_count=262144",
+      "sudo echo 'vm.max_map_count=262144' >> /etc/sysctl.conf",
       "sudo mkdir -p /etc/systemd/system/docker.service.d",
       "sudo mv /tmp/docker.conf /etc/systemd/system/docker.service.d/docker.conf",
       "sudo chmod +x /tmp/install-docker-ce.sh",
