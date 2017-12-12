@@ -19,7 +19,7 @@ configs:
 
 services:
   gateway:
-    image: functions/gateway:0.6.7
+    image: functions/gateway:0.6.13
     environment:
       faas_nats_address: "nats"
       faas_nats_port: 4222
@@ -41,7 +41,7 @@ services:
           - 'node.role == manager'
 
   nats:
-    image: nats-streaming:0.5.0
+    image: nats-streaming:0.6.0
     ports:
       - 4222:4222
       - 8222:8222
@@ -54,7 +54,7 @@ services:
           - 'node.role == manager'
 
   queue-worker:
-    image: functions/queue-worker:0.1.1
+    image: functions/queue-worker:0.4
     networks:
         - net
     deploy:
@@ -68,7 +68,7 @@ services:
           - 'node.role == manager'
 
   prometheus:
-    image: prom/prometheus:v1.7.2
+    image: prom/prometheus:v1.8.2
     configs:
       - source: prom_entrypoint
         target: /etc/prometheus/docker-entrypoint.sh
