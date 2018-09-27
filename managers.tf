@@ -45,7 +45,7 @@ resource "google_compute_instance" "manager" {
   }
 
   provisioner "file" {
-    source      = "scripts/install-docker-ce.sh"
+    source      = "${path.module}/scripts/install-docker-ce.sh"
     destination = "/tmp/install-docker-ce.sh"
   }
 
