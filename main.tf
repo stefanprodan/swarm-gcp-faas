@@ -11,7 +11,7 @@ resource "google_compute_network" "swarm" {
 }
 
 data "template_file" "docker_conf" {
-  template = "${file("conf/docker.tpl")}"
+  template = "${file("${path.module}/conf/docker.tpl")}"
 
   vars {
     ip = "${var.docker_api_ip}"
@@ -19,7 +19,7 @@ data "template_file" "docker_conf" {
 }
 
 data "external" "swarm_tokens" {
-  program = ["./scripts/fetch-tokens.sh"]
+  program = ["${path.module}/scripts/fetch-tokens.sh"]
 
   query = {
     host = "${google_compute_instance.manager.0.network_interface.0.access_config.0.assigned_nat_ip}"
